@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -10,7 +11,7 @@ namespace ServerThreadPoolDemo
     public class AsyncServerController : ApiController
     {
 
-        #region   #  Async Over Sync  #
+        #region   #   Sync  #
 
 
         [Route("hello-sync")]
@@ -35,7 +36,39 @@ namespace ServerThreadPoolDemo
         {
             Thread.Sleep(4000);
 
-            return Task.FromResult( "Hello World Async" );
+            return Task.FromResult( "Hello World Async Blocking" );
+        }
+
+
+        #endregion
+
+
+        #region   #  Async Blocking 100ms #
+
+
+        [Route("hello-async-blocking-100ms")]
+        [HttpGet]
+        public Task<string> HelloAsyncBlocking100ms()
+        {
+            Thread.Sleep(100);
+
+            return Task.FromResult("Hello World Async Blocking 100ms");
+        }
+
+
+        #endregion
+
+
+        #region   #  Async Blocking with Exception #
+
+
+        [Route("hello-async-blocking-exception")]
+        [HttpGet]
+        public Task<string> HelloAsyncBlockingWitException()
+        {
+            Thread.Sleep(4000);
+
+            throw new Exception("Hello World AsyncBlocking Exception.");
         }
 
 
@@ -111,6 +144,22 @@ namespace ServerThreadPoolDemo
             await Task.Delay(4000);
 
             return "Hello World Async";
+        }
+
+
+        #endregion
+
+
+        #region   #  Async with Exception #
+
+
+        [Route("hello-async-exception")]
+        [HttpGet]
+        public async Task<string> HelloAsyncException()
+        {
+            await Task.Delay(4000);
+
+            throw new Exception("Hello World Async Exception.");
         }
 
 

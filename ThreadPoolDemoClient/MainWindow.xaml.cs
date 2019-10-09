@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Linq;
+using System.Threading;
 
 namespace ThreadPoolDemoClient
 {
@@ -11,6 +12,8 @@ namespace ThreadPoolDemoClient
     {
         public MainWindow()
         {
+            ThreadPool.SetMinThreads(1000, 1000);
+
             InitializeComponent();
 
             MainWindowViewModel mainWindowViewModel = new MainWindowViewModel();

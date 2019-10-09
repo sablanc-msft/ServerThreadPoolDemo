@@ -25,7 +25,6 @@ namespace ServerThreadPoolDemo
             {
                 Timer t = new Timer(OutputThreadPoolValues, null, 0, 500);
 
-
                 Console.ReadLine();
             }
         }

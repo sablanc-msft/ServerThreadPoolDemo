@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Prism.Commands;
 using Prism.Mvvm;
 
@@ -15,7 +16,7 @@ namespace ThreadPoolDemoClient
 {
     internal class MainWindowViewModel : BindableBase
     {
-        static readonly HttpClient s_httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(8) };
+        static readonly HttpClient s_httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(30) };
 
         private int m_simultaneousRequests = 100;
         private bool m_isRunning;
@@ -38,10 +39,13 @@ namespace ThreadPoolDemoClient
 
             m_endPoints.Add(new Uri(baseUri, "hello-sync"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-blocking"));
+            m_endPoints.Add(new Uri(baseUri, "hello-async-blocking-10ms"));
+            m_endPoints.Add(new Uri(baseUri, "hello-async-blocking-exception"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-over-sync"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-over-sync-no-threadpool"));
             m_endPoints.Add(new Uri(baseUri, "hello-sync-over-async"));
             m_endPoints.Add(new Uri(baseUri, "hello-async"));
+            m_endPoints.Add(new Uri(baseUri, "hello-async-exception"));
 
             m_selectedEndPoint = m_endPoints.FirstOrDefault();
 
@@ -167,7 +171,9 @@ namespace ThreadPoolDemoClient
                     CancellationTokenSource cts = new CancellationTokenSource();
                     m_cancellationTokenSources.Enqueue(cts);
 
-                    _ = Task.Factory.StartNew( () => CreateClientQueryTask(cts.Token), TaskCreationOptions.LongRunning );
+                    Progress<string> progress = new Progress<string>(AddLogEntry);
+
+                    _ = Task.Factory.StartNew( () => CreateClientQueryTask( progress, cts.Token ), TaskCreationOptions.LongRunning );
                 }
             }
             else if( queueOffset > 0 )
@@ -181,7 +187,7 @@ namespace ThreadPoolDemoClient
         }
 
 
-        private async Task CreateClientQueryTask( CancellationToken cancellationToken )
+        private async Task CreateClientQueryTask(IProgress<string> progress, CancellationToken cancellationToken )
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -192,20 +198,20 @@ namespace ThreadPoolDemoClient
                     Debug.Assert(m_selectedEndPoint != null);
 
                     stopwatch.Restart();
-                    //HttpResponseMessage response = await s_httpClient.GetAsync( m_selectedEndPoint );
+                    //HttpResponseMessage response = await s_httpClient.GetAsync( m_selectedEndPoint, cancellationToken );
                     //response.EnsureSuccessStatusCode();
                     //string responseBody = await response.Content.ReadAsStringAsync();
-                    // Above three lines can be replaced with new helper method below
+
                     string responseBody = await s_httpClient.GetStringAsync(m_selectedEndPoint);
 
                     stopwatch.Stop();
 
-                    AddLogEntry($"{responseBody}   {stopwatch.Elapsed.TotalSeconds:F3} secs.");
+                    progress.Report($"{responseBody}   {stopwatch.Elapsed.TotalSeconds:F3} secs.");
                 }
                 catch (Exception ex)
                 {
-                    AddLogEntry($"{ex.GetType().ToString()} Caught!");
-                    AddLogEntry($"Message :{ex.Message} ");
+                    progress.Report($"{ex.GetType().ToString()} Caught! \nMessage :{ex.Message}");
+                    //throw;
                 }
             }
         }
@@ -213,12 +219,9 @@ namespace ThreadPoolDemoClient
         
         private void AddLogEntry( string text )
         {
-            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                LogEntryViewModel viewModel = new LogEntryViewModel(text);
-                m_logEntries.Add(viewModel);
-                this.SelectedLogEntry = viewModel;
-            }));
+            LogEntryViewModel viewModel = new LogEntryViewModel(text);
+            m_logEntries.Add(viewModel);
+            this.SelectedLogEntry = viewModel;
         }
 
 
