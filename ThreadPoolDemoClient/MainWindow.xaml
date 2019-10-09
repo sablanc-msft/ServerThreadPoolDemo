@@ -30,7 +30,7 @@
         
         </ToolBar>
 
-        <ListBox Grid.Row="1" ItemsSource="{Binding LogEntries}" DisplayMemberPath="Text"
+        <ListBox Grid.Row="1" ItemsSource="{Binding LogEntries}" DisplayMemberPath="Text" FontSize="12"
                  SelectedItem="{Binding SelectedLogEntry}" 
                  SelectionChanged="ListBox_SelectionChanged">
            
