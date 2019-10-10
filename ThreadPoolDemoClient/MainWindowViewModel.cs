@@ -45,6 +45,7 @@ namespace ThreadPoolDemoClient
             m_endPoints.Add(new Uri(baseUri, "hello-async-over-sync-no-threadpool"));
             m_endPoints.Add(new Uri(baseUri, "hello-sync-over-async"));
             m_endPoints.Add(new Uri(baseUri, "hello-async"));
+            m_endPoints.Add(new Uri(baseUri, "hello-async-100ms"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-exception"));
 
             m_selectedEndPoint = m_endPoints.FirstOrDefault();

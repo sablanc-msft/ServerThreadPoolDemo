@@ -150,6 +150,22 @@ namespace ServerThreadPoolDemo
         #endregion
 
 
+        #region   #  Async  #
+
+
+        [Route("hello-async-100ms")]
+        [HttpGet]
+        public async Task<string> HelloAsync100ms()
+        {
+            await Task.Delay(100);
+
+            return "Hello World Async 100ms";
+        }
+
+
+        #endregion
+
+
         #region   #  Async with Exception #
 
 
