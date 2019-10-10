@@ -39,7 +39,7 @@ namespace ThreadPoolDemoClient
 
             m_endPoints.Add(new Uri(baseUri, "hello-sync"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-blocking"));
-            m_endPoints.Add(new Uri(baseUri, "hello-async-blocking-10ms"));
+            m_endPoints.Add(new Uri(baseUri, "hello-async-blocking-100ms"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-blocking-exception"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-over-sync"));
             m_endPoints.Add(new Uri(baseUri, "hello-async-over-sync-no-threadpool"));
